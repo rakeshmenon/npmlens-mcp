@@ -11,6 +11,15 @@ Setup
 - Tests: `pnpm test` (coverage enforced to 100%)
 - Coverage report: `pnpm coverage` -> `coverage/index.html`
 
+Git hooks (Husky + lint-staged)
+
+- We use Husky (latest) to run ESLint and related tests on staged files at commit time.
+- After installing deps, Husky should be enabled via the `prepare` script.
+- If hooks don’t fire, ensure the hooks path and executable bit:
+  - `git config core.hooksPath .husky`
+  - `chmod +x .husky/*`
+  - Commit again.
+
 Project structure
 
 - `src/index.ts` — MCP server (stdio)

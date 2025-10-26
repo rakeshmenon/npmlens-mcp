@@ -1,20 +1,37 @@
-# NPMLens MCP (MCP Server)
+# NPMLens MCP
 
-An MCP server that lets agents and developers search npm packages and fetch READMEs via structured tools.
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
+![Node](https://img.shields.io/badge/Node-%3E%3D18.17-339933?logo=node.js&logoColor=white)
+![MCP](https://img.shields.io/badge/MCP-Server-6E56CF)
+![Tests](https://img.shields.io/badge/tests-Vitest-729B1B?logo=vitest&logoColor=white)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![Lint](https://img.shields.io/badge/lint-ESLint-4B32C3?logo=eslint&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
+NPMLens MCP is a modern Model Context Protocol (MCP) server that gives AI agents and developers a fast, structured way to explore the npm registry — search packages, fetch READMEs, and pull useful context (downloads, GitHub info, snippets) without web scraping.
+
+Highlights
+
+- Structured npm search (with ranking weights)
+- Direct README fetch with optional truncation
+- Enriched package info (downloads + GitHub)
+- Quick usage snippet extraction from README
+- Stdio MCP transport, ready for MCP-compatible clients
+- 100% test coverage; strict linting and type-checking
 
 Tools
 
-- `searchNpm`: Search the npm registry for packages with optional ranking weights.
-- `getReadme`: Fetch README text for a given package (optionally a version, with truncation).
-- `getPackageInfo`: Enriched info: registry metadata + last-week downloads + GitHub details.
-- `getDownloads`: Downloads for last day/week/month from `api.npmjs.org`.
-- `getUsageSnippet`: Extract a likely usage snippet from README.
+- `search_npm` — Search npm with optional weights. Alias: `searchNpm`.
+- `get_readme` — Fetch README text for a package/version. Alias: `getReadme`.
+- `get_package_info` — Registry + downloads + GitHub details. Alias: `getPackageInfo`.
+- `get_downloads` — Day/week/month downloads from api.npmjs.org. Alias: `getDownloads`.
+- `get_usage_snippet` — Extract a likely usage snippet from README. Alias: `getUsageSnippet`.
 
 Transport
 
-- Uses MCP over stdio (JSON-RPC). Works with MCP-compatible clients.
+- MCP over stdio (JSON-RPC). Works with MCP-compatible clients.
 
-## Quick start
+## Quick Start
 
 Prerequisites
 
@@ -100,19 +117,19 @@ Manual MCP check (JSON-RPC examples)
   - Call search:
 
     ```json
-    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"searchNpm","arguments":{"query":"react debounce hook","size":10}}}
+    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_npm","arguments":{"query":"react debounce hook","size":10}}}
     ```
 
-  - Call getReadme:
+  - Call get_readme:
 
     ```json
-    {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"getReadme","arguments":{"name":"react"}}}
+    {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"get_readme","arguments":{"name":"react"}}}
     ```
 
-  - Call getPackageInfo:
+  - Call get_package_info:
 
     ```json
-    {"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"getPackageInfo","arguments":{"name":"react"}}}
+    {"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"get_package_info","arguments":{"name":"react"}}}
     ```
 
 Environment variables (optional)
@@ -156,7 +173,7 @@ Usage snippet
 pnpm demo:snippet -- react
 ```
 
-## Tool schemas
+## Tool Schemas
 
 searchNpm
 
@@ -185,7 +202,7 @@ getUsageSnippet
 - input: `{ name: string, version?: string }`
 - output: `{ name, version?, snippet?: { language?, code, heading? } }`
 
-## Example MCP messages (stdio)
+## Example MCP Messages (stdio)
 
 Initialize
 
@@ -223,6 +240,12 @@ Get enriched info
 - GitHub details missing: likely hitting unauthenticated rate limits; set `GITHUB_TOKEN`.
 - Network or rate limit errors: retry, reduce requests, or increase cache TTL.
 - MCP client cannot find the server: confirm absolute path to `dist/index.js` and correct permissions.
+
+## Development
+
+- Format/lint/typecheck: `pnpm lint`
+- Tests: `pnpm test` (100% coverage enforced via `pnpm coverage`)
+- Pre-commit hooks: Husky + lint-staged run typecheck, ESLint and related tests on staged files
 
 ## Security notes
 
