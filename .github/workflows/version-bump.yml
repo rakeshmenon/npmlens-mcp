@@ -1,0 +1,66 @@
+name: Version Bump PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      level:
+        description: "Semver level"
+        type: choice
+        required: true
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Configure Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version (no tag)
+        run: |
+          pnpm version ${{ inputs.level }} --no-git-tag-version -m "chore(release): %s [skip ci]"
+
+      - name: Read new version
+        id: pkg
+        run: echo "version=$(node -p 'require("./package.json").version')" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(release): v${{ steps.pkg.outputs.version }} [skip ci]"
+          title: "chore(release): v${{ steps.pkg.outputs.version }}"
+          body: |
+            Automated version bump to v${{ steps.pkg.outputs.version }}.
+
+            After merging, the Release workflow will tag and publish to npm.
+          branch: "release/v${{ steps.pkg.outputs.version }}"
+          labels: release
