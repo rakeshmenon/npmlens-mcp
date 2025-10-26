@@ -1,13 +1,24 @@
 #!/usr/bin/env node
+/**
+ * Small developer CLI for trying server logic without an MCP client.
+ * Exposes basic commands: search, readme, info, downloads, snippet.
+ */
 import { searchNpm as _searchNpm, getReadme as _getReadme } from "./npm.js";
 import { downloadsLast as _downloadsLast } from "./downloads.js";
 import { fetchGithubRepo as _fetchGithubRepo } from "./github.js";
 import { extractUsageSnippet as _extractUsageSnippet } from "./snippet.js";
 
+/** Narrow an arbitrary string to a valid downloads period. */
 function isPeriod(x: string): x is "day" | "week" | "month" {
   return x === "day" || x === "week" || x === "month";
 }
 
+/**
+ * Run the demo CLI.
+ *
+ * @param argv - Process argv (defaults to `process.argv`).
+ * @param deps - Optional dependency injection for testing.
+ */
 export async function run(
   argv: string[] = process.argv,
   deps: {
@@ -95,6 +106,7 @@ export async function run(
   }
 }
 
+/** Print CLI help text. */
 function help(): void {
   console.log(
     `NPMLens MCP demo CLI\n\nCommands:\n  search <query...>    Search npm (default: 'react debounce hook')\n  readme <pkg> [ver]   Print README for package\n  info <pkg> [ver]     Print enriched info (downloads + GitHub)\n  downloads <pkg> [p]  Print downloads for day/week/month\n  snippet <pkg> [ver]  Extract usage snippet from README\n`

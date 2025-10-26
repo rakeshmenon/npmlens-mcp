@@ -1,11 +1,24 @@
+/** HTTP helper with timeout and simple retry logic. */
 const DEFAULT_TIMEOUT_MS = 12_000;
 
+/** Options for {@link httpGet}. */
 export type FetchOptions = {
+  /** Request timeout in milliseconds (default: 12s). */
   timeoutMs?: number;
+  /** Additional headers to include in the request. */
   headers?: Record<string, string>;
+  /** Number of retry attempts on network failures (default: 1). */
   retries?: number;
 };
 
+/**
+ * Perform a GET request with a timeout and basic retry backoff.
+ *
+ * @param url - Absolute URL to fetch.
+ * @param opts - Optional {@link FetchOptions} configuration.
+ * @returns The fetch {@link Response} object.
+ * @throws If all attempts fail or the request times out.
+ */
 export async function httpGet(url: string, opts: FetchOptions = {}): Promise<Response> {
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const headers: Record<string, string> = {
@@ -31,6 +44,7 @@ export async function httpGet(url: string, opts: FetchOptions = {}): Promise<Res
   throw new Error(String(lastErr));
 }
 
+/** Sleep helper used between retries. */
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
