@@ -1,18 +1,32 @@
+/** Common links for a package result. */
 export type PackageLinks = {
+  /** Link to the package on npmjs.com */
   npm?: string;
+  /** Project homepage */
   homepage?: string;
+  /** Repository URL */
   repository?: string;
 };
 
+/** A single npm search result mapped into a stable shape. */
 export type PackageResult = {
+  /** Package name */
   name: string;
+  /** Latest version in the search object */
   version: string;
+  /** Optional description */
   description?: string;
+  /** Publish date of the version */
   date?: string;
+  /** Useful links */
   links: PackageLinks;
+  /** Maintainer usernames */
   maintainers?: string[];
+  /** Publisher username */
   publisher?: string;
+  /** Package keywords */
   keywords?: string[];
+  /** npm scoring metric */
   score: number;
 };
 
@@ -41,6 +55,16 @@ import { httpGet } from "./http.js";
 const SEARCH_ENDPOINT = "https://registry.npmjs.org/-/v1/search";
 const PACKAGE_ENDPOINT = "https://registry.npmjs.org";
 
+/**
+ * Search the npm registry using the official search API and map
+ * results to {@link PackageResult} items.
+ *
+ * @param query - Search text, e.g. "react debounce hook".
+ * @param size - Page size (1..250, default 10).
+ * @param from - Offset for pagination.
+ * @param weights - Optional ranking weights.
+ * @returns Total hits and mapped results.
+ */
 export async function searchNpm(
   query: string,
   size = 10,
@@ -92,6 +116,14 @@ type NpmPackageMeta = {
   homepage?: string;
 };
 
+/**
+ * Read package metadata from the registry and return core details
+ * along with README when available.
+ *
+ * @param pkg - Package name.
+ * @param version - Optional version.
+ * @returns Minimal metadata including README, repository, and homepage.
+ */
 export async function getReadme(
   pkg: string,
   version?: string

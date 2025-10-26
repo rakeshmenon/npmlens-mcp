@@ -1,8 +1,19 @@
-// Extract a simple usage snippet from README markdown.
-// Heuristics: Prefer first code block under a heading containing 'usage' or 'example'.
+/**
+ * Extract a simple usage snippet from README markdown. Heuristics:
+ * prefer the first code block that appears under a heading like
+ * “Usage”, “Example”, “Getting Started”, or “Quick Start”. Fallbacks to
+ * a JS/TS/shell-looking block, then to the first non-empty block.
+ */
 
+/** Usage snippet extracted from markdown. */
 export type Snippet = { language?: string; code: string; heading?: string } | undefined;
 
+/**
+ * Parse README markdown and extract a likely usage snippet.
+ *
+ * @param readme - README markdown contents.
+ * @returns A {@link Snippet} when found, otherwise undefined.
+ */
 export function extractUsageSnippet(readme?: string): Snippet {
   if (!readme) return undefined;
   const lines = readme.split(/\r?\n/);

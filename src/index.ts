@@ -1,3 +1,8 @@
+/**
+ * NPMLens MCP stdio server. Exposes tools for npm search, README retrieval,
+ * enriched package info (downloads + GitHub), downloads, and usage snippets.
+ * This is the executable entry point used by MCP clients.
+ */
 import { searchNpm, getReadme } from "./npm.js";
 import { cacheGet, cacheSet, key } from "./cache.js";
 import { downloadsLast } from "./downloads.js";
@@ -6,6 +11,7 @@ import { extractUsageSnippet } from "./snippet.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
+/** Normalize an unknown error into a human-readable message. */
 function errorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
   try {
@@ -511,6 +517,7 @@ server.setResourceHandlers({
   },
 });
 
+/** Start the MCP server over stdio. */
 async function main() {
   // Start the MCP server over stdio
   const transport = new StdioServerTransport();
