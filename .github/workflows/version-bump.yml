@@ -47,7 +47,7 @@ jobs:
 
       - name: Bump version (no tag)
         run: |
-          pnpm version ${{ inputs.level }} --no-git-tag-version -m "chore(release): %s [skip ci]"
+          pnpm version ${{ inputs.level }} --no-git-tag-version
 
       - name: Read new version
         id: pkg
@@ -57,11 +57,11 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ github.token }}
-          commit-message: "chore(release): v${{ steps.pkg.outputs.version }} [skip ci]"
+          commit-message: "chore(release): v${{ steps.pkg.outputs.version }}"
           title: "chore(release): v${{ steps.pkg.outputs.version }}"
           body: |
             Automated version bump to v${{ steps.pkg.outputs.version }}.
 
-            After merging, the Release workflow will tag and publish to npm.
+            After merging, the Tag on Version Bump workflow will create a tag, then the Release workflow will publish to npm.
           branch: "release/v${{ steps.pkg.outputs.version }}"
           labels: release
