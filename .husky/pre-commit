@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+# Ensure full typecheck before staged checks
+command -v pnpm >/dev/null 2>&1 && PNPM=pnpm || PNPM=npx
+$PNPM typecheck || exit 1
+
+# Run lint-staged on staged files (lint + related tests)
+$PNPM lint-staged

@@ -5,17 +5,18 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 const importRun = async () => (await import("../src/cli.js")).run;
 
 let origArgv: string[];
-let exitSpy: ReturnType<typeof vi.spyOn>;
+let exitSpy: unknown;
 let logSpy: ReturnType<typeof vi.spyOn>;
 let errSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
   vi.resetModules();
   origArgv = process.argv.slice();
-  exitSpy = vi.spyOn(process, "exit").mockImplementation(((_code?: number) => {
-    // swallow exits in tests
+  // Spy on process.exit; avoid strict typing of args/return (never) by using a SpyInstance
+  exitSpy = vi.spyOn(process, "exit").mockImplementation(((() => {
+    // swallow exits in tests without throwing
     return undefined as never;
-  }) as unknown as typeof process.exit);
+  }) as unknown) as typeof process.exit);
   logSpy = vi.spyOn(console, "log").mockImplementation(() => { /* noop */ });
   errSpy = vi.spyOn(console, "error").mockImplementation(() => { /* noop */ });
 });
