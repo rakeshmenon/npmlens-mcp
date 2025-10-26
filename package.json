@@ -5,14 +5,40 @@
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": "./dist/index.js",
   "bin": {
     "npmlens-mcp": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rakeshmenon/npmlens-mcp.git"
+  },
+  "homepage": "https://github.com/rakeshmenon/npmlens-mcp",
+  "bugs": {
+    "url": "https://github.com/rakeshmenon/npmlens-mcp/issues"
+  },
+  "author": "rakeshmenon",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "npm",
+    "search",
+    "readme",
+    "packages",
+    "cli"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "prepare": "husky",
+    "prepublishOnly": "pnpm build",
     "typecheck": "tsc -p tsconfig.eslint.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
