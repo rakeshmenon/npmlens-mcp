@@ -1,7 +1,7 @@
 # NPMLens MCP
 
-![CI](https://github.com/rakeshmenon/npmlens-mcp/actions/workflows/ci.yml/badge.svg)
-![npm](https://img.shields.io/npm/v/npmlens-mcp?logo=npm)
+[![npm npmlens-mcp package](https://img.shields.io/npm/v/npmlens-mcp.svg)](https://npmjs.org/package/npmlens-mcp)
+[![CI](https://github.com/rakeshmenon/npmlens-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rakeshmenon/npmlens-mcp/actions/workflows/ci.yml)
 ![npm downloads](https://img.shields.io/npm/dm/npmlens-mcp?logo=npm)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
 ![Node](https://img.shields.io/badge/Node-%3E%3D18.17-339933?logo=node.js&logoColor=white)
@@ -11,365 +11,216 @@
 ![Lint](https://img.shields.io/badge/lint-ESLint-4B32C3?logo=eslint&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-NPMLens MCP is a modern Model Context Protocol (MCP) server that gives AI agents and developers a fast, structured way to explore the npm registry — search packages, fetch READMEs, and pull useful context (downloads, GitHub info, snippets) without web scraping.
+`npmlens-mcp` lets your coding agent (such as Claude, Cursor, Copilot, Gemini or Codex)
+search the npm registry and fetch package context (README, downloads, GitHub info, usage snippets).
+It acts as a Model‑Context‑Protocol (MCP) server, giving your AI assistant a structured way to
+discover libraries and integrate them quickly.
 
-Highlights
+## [Changelog](https://github.com/rakeshmenon/npmlens-mcp/releases) | [Contributing](./CONTRIBUTING.md) | [Troubleshooting](./docs/advanced.md#troubleshooting) | [Tool reference](./docs/advanced.md#tool-schemas)
 
-- Structured npm search (with ranking weights)
-- Direct README fetch with optional truncation
-- Enriched package info (downloads + GitHub)
-- Quick usage snippet extraction from README
-- Stdio MCP transport, ready for MCP-compatible clients
-- 100% test coverage; strict linting and type-checking
+## Key features
 
-Tools
+- Structured npm search with optional ranking weights.
+- Direct README fetch (optionally truncated).
+- Enriched package info (downloads + GitHub details).
+- Usage snippet extraction from README.
+- Stdio MCP transport, ready for MCP‑compatible clients.
 
-- `search_npm` — Search npm with optional weights. Alias: `searchNpm`.
-- `get_readme` — Fetch README text for a package/version. Alias: `getReadme`.
-- `get_package_info` — Registry + downloads + GitHub details. Alias: `getPackageInfo`.
-- `get_downloads` — Day/week/month downloads from api.npmjs.org. Alias: `getDownloads`.
-- `get_usage_snippet` — Extract a likely usage snippet from README. Alias: `getUsageSnippet`.
+## Disclaimers
 
-Transport
+`npmlens-mcp` performs network requests to npm and GitHub when tools are used.
+Avoid sharing secrets in prompts; set `GITHUB_TOKEN` only if you want higher GitHub rate limits.
 
-- MCP over stdio (JSON-RPC). Works with MCP-compatible clients.
+## Requirements
 
-## Quick Start
+- Node.js v18.17 or newer
+- npm (or pnpm)
 
-Prerequisites
+## Getting started
 
-- Node.js 18.17+
+Add the following config to your MCP client:
 
-Install (from npm)
-
-```bash
-# Run without installing (recommended)
-npx npmlens-mcp
-# or with pnpm
-pnpm dlx npmlens-mcp
-
-# Install globally
-npm i -g npmlens-mcp
-npmlens-mcp
-
-# Install locally (as a dependency)
-npm i -D npmlens-mcp
-```
-
-Run the MCP server (stdio)
-
-```bash
-# If installed globally
-npmlens-mcp
-
-# Using npx / dlx
-npx npmlens-mcp
-```
-
-The process speaks MCP over stdio. Point your MCP client to this binary/command.
-
-Dev mode
-
-```bash
-pnpm dev
-```
-
-Automated tests and coverage
-
-- Run tests: `pnpm test`
-- Watch mode: `pnpm test:watch`
-- Coverage (100% enforced): `pnpm coverage`
-- HTML report at `coverage/index.html`
-
-## How to Test
-
-Basic smoke test (CLI, no MCP)
-
-- Search: `pnpm demo:search -- react debounce hook`
-- README: `pnpm demo:readme -- react`
-- Info: `pnpm demo:info -- react`
-- Downloads: `pnpm demo:downloads -- react week`
-- Snippet: `pnpm demo:snippet -- react`
-
-You should see JSON/text output with package lists, README content, weekly downloads, and an extracted snippet.
-
-Test over MCP (stdio) using any MCP-compatible client
-
-- Configure your client to launch the server command:
-  - Recommended (no install):
-    - Command: `npx`
-    - Args: `["-y", "npmlens-mcp@latest"]`
-  - PNPM alternative:
-    - Command: `pnpm`
-    - Args: `["dlx", "npmlens-mcp@latest"]`
-- Example: Claude Desktop config (macOS) snippet for `claude_desktop_config.json`:
-
-  ```json
-  {
-    "mcpServers": {
-      "npmlens": { "command": "npx", "args": ["-y", "npmlens-mcp@latest"] }
+```json
+{
+  "mcpServers": {
+    "npmlens": {
+      "command": "npx",
+      "args": ["-y", "npmlens-mcp@latest"]
     }
   }
-  ```
+}
+```
 
-  Or with pnpm:
+> [!NOTE]
+> Using `npmlens-mcp@latest` ensures your MCP client always runs the latest published version.
 
-  ```json
-  {
-    "mcpServers": {
-      "npmlens": { "command": "pnpm", "args": ["dlx", "npmlens-mcp@latest"] }
-    }
-  }
-  ```
+### MCP Client configuration
 
-- After adding, restart the client and use the tools `search_npm` (alias: `searchNpm`), `get_readme`, `get_package_info`, `get_downloads`, `get_usage_snippet` from within the chat UI.
-
-Manual MCP check (JSON-RPC examples)
-
-- If your client allows sending raw JSON-RPC, use the messages below:
-  - Initialize:
-
-    ```json
-    {
-      "jsonrpc": "2.0",
-      "id": 1,
-      "method": "initialize",
-      "params": {
-        "clientInfo": { "name": "demo", "version": "0.0.0" },
-        "capabilities": {}
-      }
-    }
-    ```
-
-  - List tools:
-
-    ```json
-    {
-      "jsonrpc": "2.0",
-      "id": 2,
-      "method": "tools/list"
-    }
-    ```
-
-  - Call search:
-
-    ```json
-    {
-      "jsonrpc": "2.0",
-      "id": 3,
-      "method": "tools/call",
-      "params": {
-        "name": "search_npm",
-        "arguments": {
-          "query": "react debounce hook",
-          "size": 10
-        }
-      }
-    }
-    ```
-
-  - Call get_readme:
-
-    ```json
-    {
-      "jsonrpc": "2.0",
-      "id": 4,
-      "method": "tools/call",
-      "params": {
-        "name": "get_readme",
-        "arguments": { "name": "react" }
-      }
-    }
-    ```
-
-  - Call get_package_info:
-
-    ```json
-    {
-      "jsonrpc": "2.0",
-      "id": 5,
-      "method": "tools/call",
-      "params": {
-        "name": "get_package_info",
-        "arguments": { "name": "react" }
-      }
-    }
-    ```
-
-Environment variables (optional)
-
-- `GITHUB_TOKEN`: increases GitHub API rate limits for repo enrichment.
-- `CACHE_TTL_MS`: default TTL for in-memory cache (ms). Default 60000.
-- `CACHE_MAX`: max entries for cache. Default 500.
-
-## Demo CLI (no MCP)
-
-A tiny CLI is included to try functionality directly:
-
-Search
+<details>
+  <summary>Amp</summary>
+  Follow the Amp docs and use the config provided above. You can also install via CLI:
 
 ```bash
-npx -y npmlens-mcp@latest --help
-# Or try a standalone search via the built-in demo commands in this repo (dev only)
-pnpm demo:search -- react debounce hook
+amp mcp add npmlens -- npx npmlens-mcp@latest
+```
 
-Version pinning guidance
-- Latest (moving): use `@latest` as shown above.
-- Major pin: `npmlens-mcp@0` (gets newest 0.x).
+</details>
+
+<details>
+  <summary>Claude Code</summary>
+  Use the Claude Code CLI to add the NPMLens MCP server (see the Claude Code MCP guide):
+
+```bash
+claude mcp add npmlens npx npmlens-mcp@latest
+```
+
+</details>
+
+<details>
+  <summary>Cline</summary>
+  Follow https://docs.cline.bot/mcp/configuring-mcp-servers and use the config provided above.
+</details>
+
+<details>
+  <summary>Codex</summary>
+  Use the Codex CLI to add the server:
+
+```bash
+codex mcp add npmlens -- npx npmlens-mcp@latest
+```
+
+</details>
+
+<details>
+  <summary>Copilot CLI</summary>
+
+Start Copilot CLI:
+
+```bash
+copilot
+```
+
+Start the dialog to add a new MCP server by running:
+
+```bash
+/mcp add
+```
+
+Configure the following fields and press `CTRL+S` to save:
+
+- **Server name:** `npmlens`
+- **Server Type:** `Local`
+- **Command:** `npx -y npmlens-mcp@latest`
+
+</details>
+
+<details>
+  <summary>Copilot / VS Code</summary>
+  Use the VS Code CLI:
+
+```bash
+code --add-mcp '{"name":"npmlens","command":"npx","args":["-y","npmlens-mcp@latest"]}'
+```
+
+</details>
+
+<details>
+  <summary>Cursor</summary>
+
+Go to `Cursor Settings` -> `MCP` -> `New MCP Server`. Use the config provided above.
+
+</details>
+
+<details>
+  <summary>Gemini CLI</summary>
+Install the NPMLens MCP server using the Gemini CLI.
+
+**Project wide:**
+
+```bash
+gemini mcp add npmlens npx npmlens-mcp@latest
+```
+
+**Globally:**
+
+```bash
+gemini mcp add -s user npmlens npx npmlens-mcp@latest
+```
+
+Alternatively, follow the Gemini CLI MCP guide and use the standard config from above.
+
+</details>
+
+<details>
+  <summary>Gemini Code Assist</summary>
+  Follow the provider guide to configure MCP servers and use the standard config from above.
+</details>
+
+<details>
+  <summary>JetBrains AI Assistant & Junie</summary>
+
+Go to `Settings | Tools | AI Assistant | Model Context Protocol (MCP)` -> `Add`.
+Use the config provided above. Same for Junie under `Settings | Tools | Junie | MCP Settings` -> `Add`.
+
+</details>
+
+<details>
+  <summary>Warp</summary>
+
+Go to `Settings | AI | Manage MCP Servers` -> `+ Add` and use the config provided above.
+
+</details>
+
+### Your first prompt
+
+Enter the following prompt in your MCP client to check if everything works:
+
+```
+Find 5 React debounce hook libraries, include weekly downloads, and fetch the README for the top result.
+```
+
+---
+
+## Advanced and Local Usage
+
+Looking for JSON‑RPC examples, tool schemas, the local dev CLI, troubleshooting, or contributor setup?
+
+- See `docs/advanced.md` for all technical details.
+- See `CONTRIBUTING.md` for contributing guidelines.
+
+## Tools
+
+Below are the tools exposed by NPMLens MCP. For full JSON schemas, see the [Tool reference](./docs/advanced.md#tool-schemas).
+
+- `search_npm`
+  - Search the npm registry with optional ranking weights.
+  - Args: `query` (string, required), `size` (1..250), `from` (offset), `weights` (object with `quality`, `popularity`, `maintenance`).
+  - Returns: `{ total, results[] }` where each result includes `name`, `version`, `description`, `links`, `score`, etc.
+
+- `get_readme`
+  - Fetch README markdown for a package (optionally by version).
+  - Args: `name` (string, required), `version` (string), `truncateAt` (number).
+  - Returns: JSON metadata (`name`, `version`, `repository`, `homepage`) and the README as text content.
+
+- `get_package_info`
+  - Enriched package info combining registry metadata, npm downloads, and GitHub details.
+  - Args: `name` (string, required), `version` (string), `includeReadme` (boolean).
+  - Returns: `name`, `version`, `repository`, `homepage`, `github{ fullName, url, stars, forks, license }`, `downloadsLastWeek`, and optional `readme`.
+
+- `get_downloads`
+  - Fetch npm downloads for the last `day`/`week`/`month`.
+  - Args: `name` (string, required), `period` (`day` | `week` | `month`, default `week`).
+  - Returns: `{ downloads, start, end, package }`.
+
+- `get_usage_snippet`
+  - Extract a likely usage snippet from a package README.
+  - Args: `name` (string, required), `version` (string).
+  - Returns: `{ snippet: { language, code, heading } }`.
+
+## Version pinning guidance
+
+- Latest (moving): use `@latest`.
+- Major pin: `npmlens-mcp@0` (newest 0.x).
 - Minor pin: `npmlens-mcp@0.1` (newest 0.1.x).
 - Exact: `npmlens-mcp@0.1.3`.
 Tip: check the current version with `npm view npmlens-mcp version`.
-```
-
-Fetch README
-
-```bash
-pnpm demo:readme -- react
-pnpm demo:readme -- lodash 4.17.21
-```
-
-Enriched info (downloads + GitHub)
-
-```bash
-pnpm demo:info -- react
-```
-
-Downloads
-
-```bash
-pnpm demo:downloads -- react week
-```
-
-Usage snippet
-
-```bash
-pnpm demo:snippet -- react
-```
-
-## Tool Schemas
-
-searchNpm
-
-- input: `{ query: string, size?: number (1..250), from?: number, weights?: { quality?: number, popularity?: number, maintenance?: number } }`
-- output: `{ total: number, results: Array<{ name, version, description?, date?, links, maintainers?, publisher?, keywords?, score }> }`
-
-getReadme
-
-- input: `{ name: string, version?: string, truncateAt?: number }`
-- output: two contents
-  - json content: `{ name, version?, repository?, homepage? }`
-  - text content: README markdown (possibly truncated)
-
-getPackageInfo
-
-- input: `{ name: string, version?: string, includeReadme?: boolean }`
-- output: `{ name, version?, repository?, homepage?, github?: { fullName, url, stars?, forks?, license? }, downloadsLastWeek: number, readme?: string }`
-
-getDownloads
-
-- input: `{ name: string, period?: 'day'|'week'|'month' }`
-- output: npm downloads point payload
-
-getUsageSnippet
-
-- input: `{ name: string, version?: string }`
-- output: `{ name, version?, snippet?: { language?, code, heading? } }`
-
-## Example MCP Messages (stdio)
-
-Initialize
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "initialize",
-  "params": {
-    "clientInfo": { "name": "demo", "version": "0.0.0" },
-    "capabilities": {}
-  }
-}
-```
-
-List tools
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 2,
-  "method": "tools/list"
-}
-```
-
-Call search
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 3,
-  "method": "tools/call",
-  "params": {
-    "name": "search_npm",
-    "arguments": { "query": "react debounce hook", "size": 10 }
-  }
-}
-```
-
-Call get_readme
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 4,
-  "method": "tools/call",
-  "params": {
-    "name": "get_readme",
-    "arguments": { "name": "react" }
-  }
-}
-```
-
-Get enriched info
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 5,
-  "method": "tools/call",
-  "params": {
-    "name": "get_package_info",
-    "arguments": { "name": "react" }
-  }
-}
-```
-
-## Troubleshooting
-
-- ESM import errors: ensure Node 18.17+ and that you ran `pnpm build` (or use `pnpm dev`).
-- GitHub details missing: likely hitting unauthenticated rate limits; set `GITHUB_TOKEN`.
-- Network or rate limit errors: retry, reduce requests, or increase cache TTL.
-- MCP client cannot find the server: confirm absolute path to `dist/index.js` and correct permissions.
-
-## Development
-
-- Format/lint/typecheck: `pnpm lint`
-- Tests: `pnpm test` (100% coverage enforced via `pnpm coverage`)
-- Pre-commit hooks: Husky + lint-staged run typecheck, ESLint and related tests on staged files
-
-## Security notes
-
-- Inputs are validated by JSON Schema at the tool boundary; additional checks are in handlers.
-- In-memory caching with TTL reduces request volume; adjust `CACHE_TTL_MS`/`CACHE_MAX` via env.
-- GitHub API usage is optional; set `GITHUB_TOKEN` to raise rate limits.
-- Only communicates with npm and GitHub APIs, no arbitrary URL fetching.
-
-## Roadmap
-
-- Add more filters (types, TS typings, keywords) for search.
-- Support sorting by downloads/stars client-side.
-- Add persistent cache or Etags for READMEs.
-- Tests for search mapping and snippet extraction.
-
-## License
-
-MIT — see `LICENSE`.

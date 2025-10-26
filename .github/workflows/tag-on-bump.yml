@@ -1,0 +1,58 @@
+name: Tag on Version Bump
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - package.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tag-on-bump-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    name: Create tag if version changed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read current version
+        id: cur
+        run: echo "ver=$(node -p 'require("./package.json").version')" >> $GITHUB_OUTPUT
+
+      - name: Read previous version
+        id: prev
+        shell: bash
+        run: |
+          # Write previous package.json (if it exists) to a temp file
+          git show HEAD^:package.json > prev.json 2>/dev/null || echo '{}' > prev.json
+          echo "ver=$(node -e 'const fs=require("fs"); try{const v=JSON.parse(fs.readFileSync("prev.json","utf8")).version||""; console.log(v)}catch(e){console.log("")}' )" >> $GITHUB_OUTPUT
+
+      - name: Decide if changed
+        id: decide
+        run: |
+          if [ "${{ steps.cur.outputs.ver }}" = "${{ steps.prev.outputs.ver }}" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and push tag
+        if: ${{ steps.decide.outputs.changed == 'true' }}
+        run: |
+          TAG="v${{ steps.cur.outputs.ver }}"
+          echo "Preparing tag: $TAG (prev=${{ steps.prev.outputs.ver }})"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG already exists; skipping."
+            exit 0
+          fi
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "refs/tags/$TAG"
+
