@@ -3,8 +3,7 @@ name: Tag on Version Bump
 on:
   push:
     branches: ["main"]
-    paths:
-      - package.json
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -23,9 +22,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Read current version
         id: cur
-        run: echo "ver=$(node -p 'require("./package.json").version')" >> $GITHUB_OUTPUT
+        run: echo "ver=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_OUTPUT
 
       - name: Read previous version
         id: prev
@@ -33,7 +37,7 @@ jobs:
         run: |
           # Write previous package.json (if it exists) to a temp file
           git show HEAD^:package.json > prev.json 2>/dev/null || echo '{}' > prev.json
-          echo "ver=$(node -e 'const fs=require("fs"); try{const v=JSON.parse(fs.readFileSync("prev.json","utf8")).version||""; console.log(v)}catch(e){console.log("")}' )" >> $GITHUB_OUTPUT
+          echo "ver=$(node -e 'const fs=require(\"fs\"); try{const v=JSON.parse(fs.readFileSync(\"prev.json\",\"utf8\")).version||\"\"; console.log(v)}catch(e){console.log(\"\")}' )" >> $GITHUB_OUTPUT
 
       - name: Decide if changed
         id: decide
