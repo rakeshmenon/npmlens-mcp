@@ -3,7 +3,10 @@
  * enriched package info (downloads + GitHub), downloads, and usage snippets.
  * This is the executable entry point used by MCP clients.
  */
-import { searchNpm, getReadme } from "./npm.js";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { searchNpm, getReadme, getPackageVersions, getPackageDependencies, comparePackages } from "./npm.js";
 import { cacheGet, cacheSet, key } from "./cache.js";
 import { downloadsLast } from "./downloads.js";
 import { fetchGithubRepo } from "./github.js";
@@ -35,8 +38,12 @@ type ServerLike = {
   start: (transport: unknown) => Promise<void>;
 };
 
+// Read version from package.json
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const packageJson = JSON.parse(readFileSync(join(__dirname, "../package.json"), "utf8")) as { version: string };
+
 const server = (new Server(
-  { name: "npmlens-mcp", version: "0.1.0" },
+  { name: "npmlens-mcp", version: packageJson.version },
   {
     capabilities: {
       tools: {},
@@ -426,6 +433,149 @@ server.tool(
       return { content: [{ type: "json", json: { name: data.name, version: data.version, snippet } }] } as const;
     } catch (err: unknown) {
       return { isError: true, content: [{ type: "text", text: `getUsageSnippet error: ${errorMessage(err)}` }] } as const;
+    }
+  }
+);
+
+server.tool(
+  "get_package_versions",
+  {
+    description: "List all available versions of a package with publish dates and dist tags.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Package name" },
+        limit: { type: "number", minimum: 1, description: "Maximum number of versions to return" },
+        since: { type: "string", description: "Filter versions published after this date (ISO date or relative like '6 months')" },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+  },
+  async (args) => {
+    try {
+      const { name, limit, since } = args as { name: string; limit?: number; since?: string };
+      const k = key(["versions", name, limit ?? 0, since ?? ""]);
+      const cached = cacheGet<unknown>(k);
+      if (cached) return { content: [{ type: "json", json: cached }] } as const;
+      const data = await getPackageVersions(name, limit, since);
+      cacheSet(k, data, 5 * 60_000);
+      return { content: [{ type: "json", json: data }] } as const;
+    } catch (err: unknown) {
+      return { isError: true, content: [{ type: "text", text: `get_package_versions error: ${errorMessage(err)}` }] } as const;
+    }
+  }
+);
+
+server.tool(
+  "get_package_dependencies",
+  {
+    description: "Get the dependency tree for a package.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Package name" },
+        version: { type: "string", description: "Package version (defaults to latest)" },
+        depth: { type: "number", minimum: 1, maximum: 3, default: 1, description: "Depth of dependency tree to fetch" },
+        includeDevDependencies: { type: "boolean", default: false, description: "Include devDependencies" },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+  },
+  async (args) => {
+    try {
+      const { name, version, depth = 1, includeDevDependencies = false } = args as {
+        name: string;
+        version?: string;
+        depth?: number;
+        includeDevDependencies?: boolean;
+      };
+      const k = key(["deps", name, version ?? "latest", depth, includeDevDependencies]);
+      const cached = cacheGet<unknown>(k);
+      if (cached) return { content: [{ type: "json", json: cached }] } as const;
+      const data = await getPackageDependencies(name, version, depth, includeDevDependencies);
+      cacheSet(k, data, 5 * 60_000);
+      return { content: [{ type: "json", json: data }] } as const;
+    } catch (err: unknown) {
+      return { isError: true, content: [{ type: "text", text: `get_package_dependencies error: ${errorMessage(err)}` }] } as const;
+    }
+  }
+);
+
+server.tool(
+  "compare_packages",
+  {
+    description: "Compare multiple npm packages side-by-side (downloads, stars, license, etc.).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        packages: {
+          type: "array",
+          items: { type: "string" },
+          minItems: 1,
+          maxItems: 10,
+          description: "Array of package names to compare",
+        },
+      },
+      required: ["packages"],
+      additionalProperties: false,
+    },
+  },
+  async (args) => {
+    try {
+      const { packages } = args as { packages: string[] };
+      const k = key(["compare", ...packages.sort()]);
+      const cached = cacheGet<unknown>(k);
+      if (cached) return { content: [{ type: "json", json: cached }] } as const;
+      const data = await comparePackages(packages);
+      cacheSet(k, data, 5 * 60_000);
+      return { content: [{ type: "json", json: data }] } as const;
+    } catch (err: unknown) {
+      return { isError: true, content: [{ type: "text", text: `compare_packages error: ${errorMessage(err)}` }] } as const;
+    }
+  }
+);
+
+server.tool(
+  "search_by_keywords",
+  {
+    description: "Search npm packages by specific keywords/tags.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        keywords: {
+          type: "array",
+          items: { type: "string" },
+          minItems: 1,
+          description: "Keywords to search for",
+        },
+        operator: {
+          type: "string",
+          enum: ["AND", "OR"],
+          default: "AND",
+          description: "Logical operator for combining keywords",
+        },
+        size: { type: "number", minimum: 1, maximum: 250, default: 10 },
+      },
+      required: ["keywords"],
+      additionalProperties: false,
+    },
+  },
+  async (args) => {
+    try {
+      const { keywords, operator = "AND", size = 10 } = args as { keywords: string[]; operator?: "AND" | "OR"; size?: number };
+      // Construct search query
+      const query = operator === "AND" ? keywords.join(" ") : keywords.join(" OR ");
+      const k = key(["search_keywords", query, size]);
+      const cached = cacheGet<unknown>(k);
+      if (cached) return { content: [{ type: "json", json: cached }] } as const;
+      const { total, results } = await searchNpm(query, size);
+      const payload = { total, results };
+      cacheSet(k, payload);
+      return { content: [{ type: "json", json: payload }] } as const;
+    } catch (err: unknown) {
+      return { isError: true, content: [{ type: "text", text: `search_by_keywords error: ${errorMessage(err)}` }] } as const;
     }
   }
 );
