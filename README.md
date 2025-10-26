@@ -1,6 +1,6 @@
 <h1>
   <img src="images/npmlens-mcp-logo.svg" alt="NPMLens MCP Logo"
-       width="48" height="48" style="vertical-align: middle;">
+       width="48" height="48" align="left" style="margin-right: 12px;">
   NPMLens MCP
 </h1>
 
