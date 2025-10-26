@@ -1,8 +1,8 @@
-<h1 style="display: flex; align-items: center; gap: 12px;">
+<div align="center">
   <img src="images/npmlens-mcp-logo.svg" alt="NPMLens MCP Logo"
-       width="48" height="48">
-  <span>NPMLens MCP</span>
-</h1>
+       width="80" height="80">
+  <h1>NPMLens MCP</h1>
+</div>
 
 <p>
   <a href="https://npmjs.org/package/npmlens-mcp">
