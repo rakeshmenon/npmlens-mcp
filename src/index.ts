@@ -96,6 +96,56 @@ server.tool(
   }
 );
 
+// snake_case alias
+server.tool(
+  "search_npm",
+  {
+    description: "Search the npm registry for packages.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Search text, e.g. 'react debounce hook'" },
+        size: { type: "number", minimum: 1, maximum: 250, default: 10 },
+        from: { type: "number", minimum: 0, default: 0 },
+        weights: {
+          type: "object",
+          properties: {
+            quality: { type: "number" },
+            popularity: { type: "number" },
+            maintenance: { type: "number" },
+          },
+          additionalProperties: false,
+        },
+      },
+      required: ["query"],
+      additionalProperties: false,
+    },
+  },
+  async (args) => {
+    try {
+      const { query, size = 10, from = 0, weights } = args as {
+        query: string;
+        size?: number;
+        from?: number;
+        weights?: { quality?: number; popularity?: number; maintenance?: number };
+      };
+      const k = key(["search", query, size, from, weights ?? {}]);
+      const cached = cacheGet<unknown>(k);
+      if (cached) {
+        return { content: [{ type: "json", json: cached }] } as const;
+      }
+      const { total, results } = await searchNpm(query, size, from, weights);
+      const payload = { total, results };
+      cacheSet(k, payload);
+      return {
+        content: [{ type: "json", json: payload }],
+      } as const;
+    } catch (err: unknown) {
+      return { isError: true, content: [{ type: "text", text: `searchNpm error: ${errorMessage(err)}` }] } as const;
+    }
+  }
+);
+
 server.tool(
   "getReadme",
   {
@@ -139,6 +189,42 @@ server.tool(
   }
 );
 
+// snake_case alias
+server.tool(
+  "get_readme",
+  {
+    description: "Fetch README text for a given npm package (optionally a specific version).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Package name, e.g. 'react'" },
+        version: { type: "string", description: "Optional version, e.g. '18.2.0'" },
+        truncateAt: { type: "number", description: "If set, truncate README to this many characters." },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+  },
+  async (args) => {
+    try {
+      const { name, version, truncateAt } = args as { name: string; version?: string; truncateAt?: number };
+      const k = key(["readme", name, version ?? "latest"]);
+      const cached = cacheGet<unknown>(k) as { name: string; version?: string; readme?: string; repository?: string; homepage?: string } | undefined;
+      const data = cached ?? (await getReadme(name, version));
+      if (!cached) cacheSet(k, data, 5 * 60_000);
+      const readme = typeof truncateAt === "number" && data.readme ? data.readme.slice(0, truncateAt) : data.readme;
+      return {
+        content: [
+          { type: "json", json: { name: data.name, version: data.version, repository: data.repository, homepage: data.homepage } },
+          { type: "text", text: readme ?? "README not available" },
+        ],
+      } as const;
+    } catch (err: unknown) {
+      return { isError: true, content: [{ type: "text", text: `getReadme error: ${errorMessage(err)}` }] } as const;
+    }
+  }
+);
+
 server.tool(
   "getPackageInfo",
   {
@@ -163,6 +249,50 @@ server.tool(
       if (cached) return { content: [{ type: "json", json: cached }] } as const;
 
       const pkg = await getReadme(name, version); // also gives repository/homepage
+      const downloads = await downloadsLast("week", name);
+      const gh = await fetchGithubRepo(pkg.repository);
+      const payload = {
+        name: pkg.name,
+        version: pkg.version,
+        repository: gh?.url ?? pkg.repository,
+        homepage: pkg.homepage,
+        github: gh,
+        downloadsLastWeek: downloads.downloads,
+        readme: includeReadme ? pkg.readme : undefined,
+      };
+      cacheSet(k, payload, 5 * 60_000);
+      return { content: [{ type: "json", json: payload }] } as const;
+    } catch (err: unknown) {
+      return { isError: true, content: [{ type: "text", text: `getPackageInfo error: ${errorMessage(err)}` }] } as const;
+    }
+  }
+);
+
+// snake_case alias
+server.tool(
+  "get_package_info",
+  {
+    description:
+      "Get enriched package info: registry metadata, last-week downloads, and GitHub repo details when available.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        version: { type: "string" },
+        includeReadme: { type: "boolean", default: false },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+  },
+  async (args) => {
+    try {
+      const { name, version, includeReadme = false } = args as { name: string; version?: string; includeReadme?: boolean };
+      const k = key(["info", name, version ?? "latest", includeReadme]);
+      const cached = cacheGet<unknown>(k);
+      if (cached) return { content: [{ type: "json", json: cached }] } as const;
+
+      const pkg = await getReadme(name, version);
       const downloads = await downloadsLast("week", name);
       const gh = await fetchGithubRepo(pkg.repository);
       const payload = {
@@ -211,8 +341,65 @@ server.tool(
   }
 );
 
+// snake_case alias
+server.tool(
+  "get_downloads",
+  {
+    description: "Get npm downloads for the last day/week/month.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        period: { type: "string", enum: ["day", "week", "month"], default: "week" },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+  },
+  async (args) => {
+    try {
+      const { name, period = "week" } = args as { name: string; period?: "day" | "week" | "month" };
+      const k = key(["downloads", name, period]);
+      const cached = cacheGet<unknown>(k);
+      if (cached) return { content: [{ type: "json", json: cached }] } as const;
+      const data = await downloadsLast(period, name);
+      cacheSet(k, data, 10 * 60_000);
+      return { content: [{ type: "json", json: data }] } as const;
+    } catch (err: unknown) {
+      return { isError: true, content: [{ type: "text", text: `getDownloads error: ${errorMessage(err)}` }] } as const;
+    }
+  }
+);
+
 server.tool(
   "getUsageSnippet",
+  {
+    description: "Extract a likely usage snippet from a package's README.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        version: { type: "string" },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+  },
+  async (args) => {
+    try {
+      const { name, version } = args as { name: string; version?: string };
+      const data = await getReadme(name, version);
+      const snippet = extractUsageSnippet(data.readme);
+      return { content: [{ type: "json", json: { name: data.name, version: data.version, snippet } }] } as const;
+    } catch (err: unknown) {
+      return { isError: true, content: [{ type: "text", text: `getUsageSnippet error: ${errorMessage(err)}` }] } as const;
+    }
+  }
+);
+
+// snake_case alias
+server.tool(
+  "get_usage_snippet",
   {
     description: "Extract a likely usage snippet from a package's README.",
     inputSchema: {

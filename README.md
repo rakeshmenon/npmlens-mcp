@@ -21,11 +21,11 @@ Highlights
 
 Tools
 
-- `searchNpm` — Search npm with optional weights.
-- `getReadme` — Fetch README text for a package/version.
-- `getPackageInfo` — Registry + downloads + GitHub details.
-- `getDownloads` — Day/week/month downloads from api.npmjs.org.
-- `getUsageSnippet` — Extract a likely usage snippet from README.
+- `search_npm` — Search npm with optional weights. Alias: `searchNpm`.
+- `get_readme` — Fetch README text for a package/version. Alias: `getReadme`.
+- `get_package_info` — Registry + downloads + GitHub details. Alias: `getPackageInfo`.
+- `get_downloads` — Day/week/month downloads from api.npmjs.org. Alias: `getDownloads`.
+- `get_usage_snippet` — Extract a likely usage snippet from README. Alias: `getUsageSnippet`.
 
 Transport
 
@@ -117,19 +117,19 @@ Manual MCP check (JSON-RPC examples)
   - Call search:
 
     ```json
-    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"searchNpm","arguments":{"query":"react debounce hook","size":10}}}
+    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_npm","arguments":{"query":"react debounce hook","size":10}}}
     ```
 
-  - Call getReadme:
+  - Call get_readme:
 
     ```json
-    {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"getReadme","arguments":{"name":"react"}}}
+    {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"get_readme","arguments":{"name":"react"}}}
     ```
 
-  - Call getPackageInfo:
+  - Call get_package_info:
 
     ```json
-    {"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"getPackageInfo","arguments":{"name":"react"}}}
+    {"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"get_package_info","arguments":{"name":"react"}}}
     ```
 
 Environment variables (optional)
@@ -246,10 +246,6 @@ Get enriched info
 - Format/lint/typecheck: `pnpm lint`
 - Tests: `pnpm test` (100% coverage enforced via `pnpm coverage`)
 - Pre-commit hooks: Husky + lint-staged run typecheck, ESLint and related tests on staged files
-
-## License
-
-MIT — see `LICENSE`.
 
 ## Security notes
 
