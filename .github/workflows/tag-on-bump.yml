@@ -44,6 +44,12 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Configure Git user
+        if: ${{ steps.decide.outputs.changed == 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Create and push tag
         if: ${{ steps.decide.outputs.changed == 'true' }}
         run: |
@@ -55,4 +61,3 @@ jobs:
           fi
           git tag -a "$TAG" -m "Release $TAG"
           git push origin "refs/tags/$TAG"
-
