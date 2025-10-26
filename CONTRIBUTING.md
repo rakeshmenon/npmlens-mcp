@@ -121,14 +121,21 @@ enforcing a high bar for code quality and safety.
 
 ## Release process
 
-- We use a PR‑based release:
-  - Trigger the "Version Bump PR" workflow
-    (`.github/workflows/version-bump.yml`) and choose patch/minor/major.
-  - Merge the PR (branch protection applies).
-  - A push to `main` tags and publishes to npm
-    (`.github/workflows/release.yml`).
+- We use a PR‑based release workflow:
+  1. Trigger "Version Bump PR" workflow
+     (`.github/workflows/version-bump.yml`) manually and choose
+     patch/minor/major.
+  2. Review and merge the PR (branch protection applies).
+  3. After merge to `main`, "Tag on Version Bump" workflow
+     (`.github/workflows/tag-on-bump.yml`) detects the version change
+     and creates a git tag.
+  4. Tag creation triggers "Release" workflow
+     (`.github/workflows/release.yml`) which builds and publishes to npm.
+- **Important**: Release workflow triggers ONLY on tag push, never on
+  regular PR merges to main.
 - Publishing requires `NPM_TOKEN` (automation token) and Actions with
   write permission.
+- See `docs/workflows.md` for detailed workflow documentation.
 
 ## MVP user experience
 

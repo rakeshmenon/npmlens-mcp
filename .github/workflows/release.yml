@@ -4,9 +4,11 @@ on:
   push:
     tags:
       - 'v*.*.*'
-  workflow_run:
-    workflows: ["Tag on Version Bump"]
-    types: [completed]
+
+# This workflow is triggered ONLY when a tag matching v*.*.* is pushed
+# Tags are created by the "Tag on Version Bump" workflow after a version
+# bump PR is merged to main
+# This ensures releases happen only after version changes, not on every push
 
 permissions:
   contents: write   # create GitHub Release notes
@@ -15,8 +17,6 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    # If triggered via workflow_run, only proceed on success
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
@@ -25,22 +25,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Derive tag
+      - name: Derive tag from ref
         id: tag
         shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            # Build tag from bumped version in main
-            V=$(node -p 'require("./package.json").version')
-            echo "tag=v$V" >> $GITHUB_OUTPUT
-          else
-            echo "tag=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Checkout tag ref
-        run: |
-          git fetch --tags --force
-          git checkout "tags/${{ steps.tag.outputs.tag }}" -b "build/${{ steps.tag.outputs.tag }}"
+        run: echo "tag=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
 
       - name: Setup PNPM
         uses: pnpm/action-setup@v4
