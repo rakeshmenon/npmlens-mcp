@@ -1,6 +1,7 @@
 # GitHub Workflows - Execution Guide
 
-This document explains the GitHub Actions workflows in this repository, categorized by purpose and execution order.
+This document explains the GitHub Actions workflows in this repository,
+categorized by purpose and execution order.
 
 ## Category 1: Continuous Integration (Quality Checks)
 
