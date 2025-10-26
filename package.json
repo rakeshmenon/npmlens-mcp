@@ -8,10 +8,11 @@
   "types": "dist/index.d.ts",
   "exports": "./dist/index.js",
   "bin": {
-    "npmlens-mcp": "dist/index.js"
+    "npmlens-mcp": "bin/npmlens-mcp.js"
   },
   "files": [
     "dist",
+    "bin",
     "README.md",
     "LICENSE"
   ],
