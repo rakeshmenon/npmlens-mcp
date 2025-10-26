@@ -185,3 +185,12 @@ See `docs/advanced.md` for detailed schemas and JSON-RPC examples.
 - Expand tests for snippet extraction and edge cases.
 - Add more keyword search operators (NOT, exact phrase matching).
 - Implement package health score based on maintenance metrics.
+
+## Version pinning guidance
+
+- Latest (moving): use `@latest`.
+- Major pin: `npmlens-mcp@0` (newest 0.x).
+- Minor pin: `npmlens-mcp@0.1` (newest 0.1.x).
+- Exact: `npmlens-mcp@0.1.3`.
+
+Tip: check the current version with `npm view npmlens-mcp version`.
