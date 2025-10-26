@@ -1,5 +1,6 @@
 # NPMLens MCP
 
+![CI](https://github.com/rakeshmenon/npmlens-mcp/actions/workflows/ci.yml/badge.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
 ![Node](https://img.shields.io/badge/Node-%3E%3D18.17-339933?logo=node.js&logoColor=white)
 ![MCP](https://img.shields.io/badge/MCP-Server-6E56CF)
