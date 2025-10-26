@@ -1,0 +1,105 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="npmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#CB3837;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C00000;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="lensGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0099FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0066FF;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00D9FF;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#00D9FF;stop-opacity:0" />
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Glow effect behind the lens -->
+  <circle cx="200" cy="200" r="120" fill="url(#glowGrad)"/>
+  
+  <!-- Central lens eye concept - merging AI eye with optical lens -->
+  <g filter="url(#glow)">
+    <!-- Outer lens ring with refraction effect -->
+    <circle cx="200" cy="200" r="90" fill="none" stroke="url(#lensGrad)" stroke-width="6"/>
+    <circle cx="200" cy="200" r="78" fill="none" stroke="#00D9FF" stroke-width="2" opacity="0.5"/>
+    
+    <!-- Lens aperture blades (like camera aperture) -->
+    <g opacity="0.4">
+      <path d="M 200 120 L 215 150 L 185 150 Z" fill="#00D9FF"/>
+      <path d="M 252 148 L 242 173 L 227 153 Z" fill="#00D9FF"/>
+      <path d="M 268 200 L 238 200 L 248 175 Z" fill="#00D9FF"/>
+      <path d="M 252 252 L 227 247 L 242 227 Z" fill="#00D9FF"/>
+      <path d="M 200 280 L 185 250 L 215 250 Z" fill="#00D9FF"/>
+      <path d="M 148 252 L 173 227 L 158 247 Z" fill="#00D9FF"/>
+      <path d="M 132 200 L 162 200 L 152 225 Z" fill="#00D9FF"/>
+      <path d="M 148 148 L 173 173 L 158 153 Z" fill="#00D9FF"/>
+    </g>
+    
+    <!-- Central "iris" made of npm packages flowing into AI -->
+    <g>
+      <!-- Inner circle - AI processing center -->
+      <circle cx="200" cy="200" r="45" fill="#0A0E27" stroke="#00D9FF" stroke-width="3"/>
+      
+      <!-- Data streams (packages being analyzed) -->
+      <g opacity="0.8">
+        <rect x="195" y="165" width="10" height="8" fill="url(#npmGrad)" rx="1"/>
+        <rect x="180" y="175" width="8" height="6" fill="url(#npmGrad)" rx="1"/>
+        <rect x="212" y="175" width="8" height="6" fill="url(#npmGrad)" rx="1"/>
+        <rect x="190" y="185" width="20" height="4" fill="#00D9FF" opacity="0.6"/>
+        
+        <rect x="195" y="205" width="10" height="12" fill="url(#npmGrad)" rx="1"/>
+        <rect x="185" y="210" width="6" height="8" fill="url(#npmGrad)" rx="1"/>
+        <rect x="209" y="210" width="6" height="8" fill="url(#npmGrad)" rx="1"/>
+        <rect x="190" y="220" width="20" height="4" fill="#00D9FF" opacity="0.6"/>
+      </g>
+      
+      <!-- Central AI/MCP node -->
+      <circle cx="200" cy="200" r="12" fill="#00D9FF"/>
+      <circle cx="200" cy="200" r="8" fill="#0066FF"/>
+      <circle cx="200" cy="200" r="4" fill="#FFFFFF"/>
+      
+      <!-- Neural network style connections -->
+      <g stroke="#00D9FF" stroke-width="1.5" fill="none" opacity="0.6">
+        <path d="M 200 188 Q 185 175 175 165"/>
+        <path d="M 200 188 Q 200 175 200 165"/>
+        <path d="M 200 188 Q 215 175 225 165"/>
+        
+        <path d="M 200 212 Q 185 225 175 235"/>
+        <path d="M 200 212 Q 200 225 200 235"/>
+        <path d="M 200 212 Q 215 225 225 235"/>
+      </g>
+      
+      <!-- Connection nodes -->
+      <circle cx="175" cy="165" r="3" fill="#CB3837"/>
+      <circle cx="200" cy="165" r="3" fill="#CB3837"/>
+      <circle cx="225" cy="165" r="3" fill="#CB3837"/>
+      <circle cx="175" cy="235" r="3" fill="#00D9FF"/>
+      <circle cx="200" cy="235" r="3" fill="#00D9FF"/>
+      <circle cx="225" cy="235" r="3" fill="#00D9FF"/>
+    </g>
+    
+    <!-- Lens refraction lines -->
+    <g stroke="#00D9FF" stroke-width="1" fill="none" opacity="0.3">
+      <line x1="140" y1="140" x2="155" y2="155"/>
+      <line x1="260" y1="140" x2="245" y2="155"/>
+      <line x1="140" y1="260" x2="155" y2="245"/>
+      <line x1="260" y1="260" x2="245" y2="245"/>
+    </g>
+  </g>
+  
+  <!-- Corner accent elements suggesting scanning/analysis -->
+  <g stroke="#00D9FF" stroke-width="2" fill="none" opacity="0.4">
+    <path d="M 130 130 L 130 110 L 150 110"/>
+    <path d="M 270 130 L 270 110 L 250 110"/>
+    <path d="M 130 270 L 130 290 L 150 290"/>
+    <path d="M 270 270 L 270 290 L 250 290"/>
+  </g>
+</svg>

@@ -1,15 +1,38 @@
-# NPMLens MCP
+<h1>
+  <img src="images/npmlens-mcp-logo.svg" alt="NPMLens MCP Logo"
+       width="48" height="48" style="vertical-align: middle;">
+  NPMLens MCP
+</h1>
 
-[![npm npmlens-mcp package](https://img.shields.io/npm/v/npmlens-mcp.svg)](https://npmjs.org/package/npmlens-mcp)
-[![CI](https://github.com/rakeshmenon/npmlens-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rakeshmenon/npmlens-mcp/actions/workflows/ci.yml)
-![npm downloads](https://img.shields.io/npm/dm/npmlens-mcp?logo=npm)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
-![Node](https://img.shields.io/badge/Node-%3E%3D18.17-339933?logo=node.js&logoColor=white)
-![MCP](https://img.shields.io/badge/MCP-Server-6E56CF)
-![Tests](https://img.shields.io/badge/tests-Vitest-729B1B?logo=vitest&logoColor=white)
-![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
-![Lint](https://img.shields.io/badge/lint-ESLint-4B32C3?logo=eslint&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-blue)
+<p>
+  <a href="https://npmjs.org/package/npmlens-mcp">
+    <img src="https://img.shields.io/npm/v/npmlens-mcp.svg"
+         alt="npm version">
+  </a>
+  <a href="https://github.com/rakeshmenon/npmlens-mcp/actions/workflows/ci.yml">
+    <img
+      src="https://github.com/rakeshmenon/npmlens-mcp/actions/workflows/ci.yml/badge.svg"
+      alt="CI">
+  </a>
+  <img src="https://img.shields.io/npm/dm/npmlens-mcp?logo=npm"
+       alt="npm downloads">
+  <img
+    src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white"
+    alt="TypeScript">
+  <img
+    src="https://img.shields.io/badge/Node-%3E%3D18.17-339933?logo=node.js&logoColor=white"
+    alt="Node">
+  <img src="https://img.shields.io/badge/MCP-Server-6E56CF" alt="MCP">
+  <img
+    src="https://img.shields.io/badge/tests-Vitest-729B1B?logo=vitest&logoColor=white"
+    alt="Tests">
+  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen"
+       alt="Coverage">
+  <img
+    src="https://img.shields.io/badge/lint-ESLint-4B32C3?logo=eslint&logoColor=white"
+    alt="Lint">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+</p>
 
 `npmlens-mcp` lets your coding agent (such as Claude, Cursor, Copilot,
 Gemini or Codex) search the npm registry and fetch package context
