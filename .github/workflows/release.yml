@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_run:
+    workflows: ["Tag on Version Bump"]
+    types: [completed]
 
 permissions:
   contents: write   # create GitHub Release notes
@@ -12,7 +15,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: ${{ github.repository_owner != '' }}
+    # If triggered via workflow_run, only proceed on success
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
@@ -20,6 +24,23 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Derive tag
+        id: tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            # Build tag from bumped version in main
+            V=$(node -p 'require("./package.json").version')
+            echo "tag=v$V" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout tag ref
+        run: |
+          git fetch --tags --force
+          git checkout "tags/${{ steps.tag.outputs.tag }}" -b "build/${{ steps.tag.outputs.tag }}"
 
       - name: Setup PNPM
         uses: pnpm/action-setup@v4
@@ -46,7 +67,7 @@ jobs:
 
       - name: Verify tag matches package.json version
         run: |
-          TAG=${GITHUB_REF##*/}
+          TAG=${{ steps.tag.outputs.tag }}
           echo "Tag: $TAG"
           PKG=v${{ steps.pkg.outputs.version }}
           echo "package.json: $PKG"
