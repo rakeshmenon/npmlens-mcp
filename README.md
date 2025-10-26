@@ -1,7 +1,7 @@
-<h1>
+<h1 style="display: flex; align-items: center; gap: 12px;">
   <img src="images/npmlens-mcp-logo.svg" alt="NPMLens MCP Logo"
-       width="48" height="48" align="left" style="margin-right: 12px;">
-  NPMLens MCP
+       width="48" height="48">
+  <span>NPMLens MCP</span>
 </h1>
 
 <p>
