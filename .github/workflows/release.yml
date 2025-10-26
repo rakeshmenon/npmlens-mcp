@@ -4,10 +4,16 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v0.1.10)'
+        required: true
+        type: string
 
-# This workflow is triggered ONLY when a tag matching v*.*.* is pushed
-# Tags are created by the "Tag on Version Bump" workflow after a version
-# bump PR is merged to main
+# This workflow is triggered when:
+# 1. A tag matching v*.*.* is pushed (automated via "Tag on Version Bump" workflow)
+# 2. Manually triggered via workflow_dispatch with a tag input
 # This ensures releases happen only after version changes, not on every push
 
 permissions:
@@ -25,10 +31,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Derive tag from ref
+      - name: Derive tag from ref or input
         id: tag
         shell: bash
-        run: echo "tag=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Setup PNPM
         uses: pnpm/action-setup@v4
