@@ -1,6 +1,8 @@
 # NPMLens MCP
 
 ![CI](https://github.com/rakeshmenon/npmlens-mcp/actions/workflows/ci.yml/badge.svg)
+![npm](https://img.shields.io/npm/v/npmlens-mcp?logo=npm)
+![npm downloads](https://img.shields.io/npm/dm/npmlens-mcp?logo=npm)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
 ![Node](https://img.shields.io/badge/Node-%3E%3D18.17-339933?logo=node.js&logoColor=white)
 ![MCP](https://img.shields.io/badge/MCP-Server-6E56CF)
@@ -38,22 +40,33 @@ Prerequisites
 
 - Node.js 18.17+
 
-Install
+Install (from npm)
 
 ```bash
-pnpm i
-pnpm build
-```
+# Run without installing (recommended)
+npx npmlens-mcp
+# or with pnpm
+pnpm dlx npmlens-mcp
 
-or with npm/yarn.
+# Install globally
+npm i -g npmlens-mcp
+npmlens-mcp
+
+# Install locally (as a dependency)
+npm i -D npmlens-mcp
+```
 
 Run the MCP server (stdio)
 
 ```bash
-node dist/index.js
+# If installed globally
+npmlens-mcp
+
+# Using npx / dlx
+npx npmlens-mcp
 ```
 
-The process speaks MCP over stdio. Point your MCP client to this binary.
+The process speaks MCP over stdio. Point your MCP client to this binary/command.
 
 Dev mode
 
@@ -83,22 +96,33 @@ You should see JSON/text output with package lists, README content, weekly downl
 Test over MCP (stdio) using any MCP-compatible client
 
 - Configure your client to launch the server command:
-  - Command: `node`
-  - Args: `["/absolute/path/to/dist/index.js"]`
+  - Recommended (no install):
+    - Command: `npx`
+    - Args: `["-y", "npmlens-mcp@latest"]`
+  - PNPM alternative:
+    - Command: `pnpm`
+    - Args: `["dlx", "npmlens-mcp@latest"]`
 - Example: Claude Desktop config (macOS) snippet for `claude_desktop_config.json`:
 
   ```json
   {
     "mcpServers": {
-      "npmlens": {
-        "command": "node",
-        "args": ["/absolute/path/to/dist/index.js"]
-      }
+      "npmlens": { "command": "npx", "args": ["-y", "npmlens-mcp@latest"] }
     }
   }
   ```
 
-- After adding, restart the client and use the tools `searchNpm`, `getReadme`, `getPackageInfo`, `getDownloads`, `getUsageSnippet` from within the chat UI.
+  Or with pnpm:
+
+  ```json
+  {
+    "mcpServers": {
+      "npmlens": { "command": "pnpm", "args": ["dlx", "npmlens-mcp@latest"] }
+    }
+  }
+  ```
+
+- After adding, restart the client and use the tools `search_npm` (alias: `searchNpm`), `get_readme`, `get_package_info`, `get_downloads`, `get_usage_snippet` from within the chat UI.
 
 Manual MCP check (JSON-RPC examples)
 
@@ -106,31 +130,70 @@ Manual MCP check (JSON-RPC examples)
   - Initialize:
 
     ```json
-    {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"clientInfo":{"name":"demo","version":"0.0.0"},"capabilities":{}}}
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "initialize",
+      "params": {
+        "clientInfo": { "name": "demo", "version": "0.0.0" },
+        "capabilities": {}
+      }
+    }
     ```
 
   - List tools:
 
     ```json
-    {"jsonrpc":"2.0","id":2,"method":"tools/list"}
+    {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "method": "tools/list"
+    }
     ```
 
   - Call search:
 
     ```json
-    {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_npm","arguments":{"query":"react debounce hook","size":10}}}
+    {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "method": "tools/call",
+      "params": {
+        "name": "search_npm",
+        "arguments": {
+          "query": "react debounce hook",
+          "size": 10
+        }
+      }
+    }
     ```
 
   - Call get_readme:
 
     ```json
-    {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"get_readme","arguments":{"name":"react"}}}
+    {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "method": "tools/call",
+      "params": {
+        "name": "get_readme",
+        "arguments": { "name": "react" }
+      }
+    }
     ```
 
   - Call get_package_info:
 
     ```json
-    {"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"get_package_info","arguments":{"name":"react"}}}
+    {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "method": "tools/call",
+      "params": {
+        "name": "get_package_info",
+        "arguments": { "name": "react" }
+      }
+    }
     ```
 
 Environment variables (optional)
@@ -146,7 +209,16 @@ A tiny CLI is included to try functionality directly:
 Search
 
 ```bash
+npx -y npmlens-mcp@latest --help
+# Or try a standalone search via the built-in demo commands in this repo (dev only)
 pnpm demo:search -- react debounce hook
+
+Version pinning guidance
+- Latest (moving): use `@latest` as shown above.
+- Major pin: `npmlens-mcp@0` (gets newest 0.x).
+- Minor pin: `npmlens-mcp@0.1` (newest 0.1.x).
+- Exact: `npmlens-mcp@0.1.3`.
+Tip: check the current version with `npm view npmlens-mcp version`.
 ```
 
 Fetch README
@@ -208,31 +280,67 @@ getUsageSnippet
 Initialize
 
 ```json
-{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"clientInfo":{"name":"demo","version":"0.0.0"},"capabilities":{}}}
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "clientInfo": { "name": "demo", "version": "0.0.0" },
+    "capabilities": {}
+  }
+}
 ```
 
 List tools
 
 ```json
-{"jsonrpc":"2.0","id":2,"method":"tools/list"}
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/list"
+}
 ```
 
-Call searchNpm
+Call search
 
 ```json
-{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"searchNpm","arguments":{"query":"react debounce hook","size":10}}}
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "search_npm",
+    "arguments": { "query": "react debounce hook", "size": 10 }
+  }
+}
 ```
 
-Call getReadme
+Call get_readme
 
 ```json
-{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"getReadme","arguments":{"name":"react"}}}
+{
+  "jsonrpc": "2.0",
+  "id": 4,
+  "method": "tools/call",
+  "params": {
+    "name": "get_readme",
+    "arguments": { "name": "react" }
+  }
+}
 ```
 
 Get enriched info
 
 ```json
-{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"getPackageInfo","arguments":{"name":"react"}}}
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "method": "tools/call",
+  "params": {
+    "name": "get_package_info",
+    "arguments": { "name": "react" }
+  }
+}
 ```
 
 ## Troubleshooting
