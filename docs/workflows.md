@@ -57,8 +57,9 @@ categorized by purpose and execution order.
 
 - **File**: `.github/workflows/release.yml`
 - **Triggers**:
-  - Push of version tags (`v*.*.*`)
-  - Completion of "Tag on Version Bump" workflow
+  - **ONLY** when version tags (`v*.*.*`) are pushed
+  - Tags are created by "Tag on Version Bump" workflow
+  - **NOT** triggered on regular pushes to main
 - **Purpose**: Build, publish to npm, and create GitHub release
 - **Steps**:
   1. Checkout tag
@@ -69,6 +70,8 @@ categorized by purpose and execution order.
   6. Create GitHub Release with auto-generated notes
 - **Requirements**: `NPM_TOKEN` secret must be set
 - **Execution Order**: Step 3 in release pipeline (final step)
+- **Important**: This workflow runs ONLY after a version bump PR is merged
+  and tag is created, never on regular PR merges
 
 ---
 
@@ -141,8 +144,8 @@ Step 3 - Automatic Publishing:
 |----------|----------|---------|-----------------|---------|
 | **CI** | Quality Check | Every PR + push to main | Parallel (always) | Lint, build, test |
 | **Version Bump PR** | Manual | workflow_dispatch | 1️⃣ (you start) | Create version bump PR |
-| **Tag on Version Bump** | Release Pipeline | Push to main (package.json) | 2️⃣ (after merge) | Create git tag |
-| **Release** | Release Pipeline | Tag creation | 3️⃣ (after tag) | Publish to npm + GitHub |
+| **Tag on Version Bump** | Release Pipeline | Push to main (package.json only) | 2️⃣ (after PR merge) | Create git tag |
+| **Release** | Release Pipeline | **Tag push only** (v*.*.*) | 3️⃣ (after tag) | Publish to npm + GitHub |
 
 ---
 
