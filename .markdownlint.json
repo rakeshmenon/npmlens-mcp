@@ -1,9 +1,12 @@
 {
   "default": true,
   "MD013": {
-    "tables": false
+    "tables": false,
+    "code_blocks": false,
+    "headings": false
   },
   "MD033": {
-    "allowed_elements": ["details", "summary"]
-  }
+    "allowed_elements": ["details", "summary", "div", "img", "h1", "p", "a"]
+  },
+  "MD041": false
 }
