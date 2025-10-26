@@ -323,11 +323,125 @@ the [Tool reference](./docs/advanced.md#tool-schemas).
   - Fetches all packages in parallel for performance.
   - Example: "Compare react-query, swr, and apollo-client".
 
-## Version pinning guidance
+## Sample usage queries
 
-- Latest (moving): use `@latest`.
-- Major pin: `npmlens-mcp@0` (newest 0.x).
-- Minor pin: `npmlens-mcp@0.1` (newest 0.1.x).
-- Exact: `npmlens-mcp@0.1.3`.
+Below are example queries you can use with your AI assistant to test all
+9 NPMLens tools:
 
-Tip: check the current version with `npm view npmlens-mcp version`.
+### search_npm
+
+```text
+Search npm for react testing libraries
+```
+
+```text
+Find packages related to "typescript validation" and show me the top 5 results
+```
+
+### get_readme
+
+```text
+Show me the README for express
+```
+
+```text
+Get the README for react version 18.0.0
+```
+
+### get_package_info
+
+```text
+Get detailed information about the lodash package
+```
+
+```text
+Tell me about the vite package including GitHub stats and download numbers
+```
+
+### get_downloads
+
+```text
+How many downloads does react have in the last week?
+```
+
+```text
+Show me download statistics for next for the last month
+```
+
+### get_usage_snippet
+
+```text
+Show me a usage example for axios
+```
+
+```text
+How do I use the commander package? Give me a code snippet.
+```
+
+### get_package_versions
+
+```text
+List all versions of React from the last year
+```
+
+```text
+Show me the version history of TypeScript since 6 months ago
+```
+
+### get_package_dependencies
+
+```text
+What dependencies does express have?
+```
+
+```text
+Show me the dependency tree for next with depth 2
+```
+
+### compare_packages
+
+```text
+Compare react, vue, and angular
+```
+
+```text
+Compare the packages axios, fetch, and node-fetch and help me decide which to use
+```
+
+### search_by_keywords
+
+```text
+Find packages with keywords "react" AND "hooks" AND "typescript"
+```
+
+```text
+Search for packages with keywords "cli" OR "terminal"
+```
+
+### Combined queries
+
+You can also ask your AI assistant to use multiple tools together:
+
+```text
+Compare react-query, swr, and apollo-client, then show me usage examples for the most popular one
+```
+
+```text
+Search for typescript validation libraries, then show me the README and dependencies for the top result
+```
+
+```text
+Find the package "zod", show me its download stats, version history, and a usage example
+```
+
+## License & Contributing
+
+NPMLens MCP is [MIT licensed](./LICENSE). Contributions are welcome!
+Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+Found a bug or have a feature request? Open an issue on
+[GitHub](https://github.com/rakeshmenon/npmlens-mcp/issues).
+
+---
+
+Made with ❤️ for the vibe coding community. Happy coding!
