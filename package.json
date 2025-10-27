@@ -1,6 +1,6 @@
 {
   "name": "npmlens-mcp",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "NPMLens MCP: a server exposing tools to search npm packages and fetch READMEs.",
   "license": "MIT",
   "type": "module",
