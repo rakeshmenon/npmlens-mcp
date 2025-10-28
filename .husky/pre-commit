@@ -5,4 +5,8 @@ command -v pnpm >/dev/null 2>&1 && PNPM=pnpm || PNPM=npx
 $PNPM typecheck || exit 1
 
 # Run lint-staged on staged files (lint + related tests)
-$PNPM lint-staged
+$PNPM lint-staged || exit 1
+
+# Generate and stage dynamic badges (tests/coverage)
+$PNPM badges || exit 1
+git add badges/*.svg 2>/dev/null || true

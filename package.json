@@ -13,6 +13,7 @@
   "files": [
     "dist",
     "bin",
+    "badges",
     "README.md",
     "LICENSE"
   ],
@@ -45,6 +46,7 @@
     "test:watch": "vitest",
     "test:integration": "tsx scripts/test-tools.ts",
     "coverage": "vitest run --coverage",
+    "badges": "tsx scripts/gen-badges.ts",
     "demo:search": "tsx src/cli.ts search",
     "demo:readme": "tsx src/cli.ts readme",
     "demo:info": "tsx src/cli.ts info",
@@ -63,6 +65,7 @@
     "@typescript-eslint/eslint-plugin": "^8.8.0",
     "@typescript-eslint/parser": "^8.8.0",
     "@vitest/coverage-v8": "2.1.9",
+    "badge-maker": "^4.1.0",
     "eslint": "^9.14.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",

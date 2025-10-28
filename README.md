@@ -23,11 +23,8 @@
     src="https://img.shields.io/badge/Node-%3E%3D18.17-339933?logo=node.js&logoColor=white"
     alt="Node">
   <img src="https://img.shields.io/badge/MCP-Server-6E56CF" alt="MCP">
-  <img
-    src="https://img.shields.io/badge/tests-Vitest-729B1B?logo=vitest&logoColor=white"
-    alt="Tests">
-  <img src="https://img.shields.io/badge/coverage-100%25-brightgreen"
-       alt="Coverage">
+  <img src="./badges/tests.svg" alt="Tests">
+  <img src="./badges/coverage.svg" alt="Coverage">
   <img
     src="https://img.shields.io/badge/lint-ESLint-4B32C3?logo=eslint&logoColor=white"
     alt="Lint">
