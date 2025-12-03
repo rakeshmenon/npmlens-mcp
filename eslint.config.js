@@ -1,4 +1,5 @@
 // Flat config for ESLint v9 + TypeScript-ESLint v8
+import { fileURLToPath } from "node:url";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
@@ -13,7 +14,8 @@ export default tseslint.config(
       parser: tseslint.parser,
       parserOptions: {
         project: "./tsconfig.eslint.json",
-        tsconfigRootDir: new URL(".", import.meta.url).pathname
+        // Use fileURLToPath for Windows compatibility
+        tsconfigRootDir: fileURLToPath(new URL(".", import.meta.url))
       }
     },
     plugins: { "@typescript-eslint": tseslint.plugin },
